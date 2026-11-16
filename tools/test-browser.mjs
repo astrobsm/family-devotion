@@ -51,7 +51,15 @@ async function main() {
   const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); })
     .then((m) => { if (m.error) throw new Error(`${method}: ${m.error.message}`); return m.result; });
   const evaluate = async (expr) => (await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true })).result.value;
-  const go = async (hash) => { await evaluate(`location.hash = ${JSON.stringify(hash)}`); await sleep(150); };
+  const go = async (hash) => {
+    await evaluate(`location.hash = ${JSON.stringify(hash)}`);
+    // wait until the router has rendered this route (slower over a network)
+    for (let i = 0; i < 40; i++) {
+      if (await evaluate(`document.readyState === 'complete' && location.hash === ${JSON.stringify(hash)} && !document.querySelector('.loading')`)) break;
+      await sleep(50);
+    }
+    await sleep(100);
+  };
   const shot = async (name) => {
     if (!shots) return;
     const { data } = await send('Page.captureScreenshot', { format: 'png' });
