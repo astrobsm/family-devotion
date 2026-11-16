@@ -2,7 +2,7 @@
 // fully static) on install, then serve everything from the cache.
 // tools/build.mjs rewrites VERSION from a hash of the files, so any content
 // change installs a new cache and the app offers "Update".
-const VERSION = 'ef2784055d9e';
+const VERSION = '162700beaca8';
 const CACHE = `family-devotion-${VERSION}`;
 const FILES = [
   './',

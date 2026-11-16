@@ -589,8 +589,13 @@
           });
         });
       }).catch(() => {});
+      // Reload only when an update replaces a running version. On the very
+      // first visit the new worker just takes control; nothing to reload.
+      const hadController = !!navigator.serviceWorker.controller;
       let reloaded = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (hadController && !reloaded) { reloaded = true; location.reload(); }
+      });
     });
   }
 
